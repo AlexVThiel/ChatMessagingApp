@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../login_page.dart';
+import '../auth/signin_page.dart';
 import '../../main.dart';
 import '../../screens/onBoard/onboard_view.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -24,7 +24,7 @@ class _OnBoardingPageState extends State<OnBoardingPage> {
   }
 
   void goToLogin() {
-    Navigator.of(context).pushNamed(LoginPage.routeName);
+    Navigator.of(context).pushNamed(SignInPage.routeName);
   }
 
   @override

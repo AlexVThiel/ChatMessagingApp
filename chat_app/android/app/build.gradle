@@ -53,10 +53,12 @@ android {
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
     }
-
     packagingOptions {
-        exclude "META-INF/DEPENDENCIES"
+        resources {
+            excludes += ['META-INF/DEPENDENCIES']
+        }
     }
+
 
     buildTypes {
         release {
