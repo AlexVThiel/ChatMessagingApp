@@ -9,11 +9,15 @@ import 'package:intl/date_symbol_data_local.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'core/constants/color.dart';
 import 'core/providers/auth_repository.dart';
+import 'core/providers/chat_reposity.dart';
+import 'core/providers/user_repository.dart';
 import 'screens/auth/profile_page.dart';
 import 'screens/auth/signin_page.dart';
 import 'network/dependency_injection.dart';
-import 'screens/onBoard/onboarding_page.dart';
+import 'screens/chats/new_chat_page.dart';
+import 'screens/main_page.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -43,23 +47,25 @@ class _MyAppState extends State<MyApp> {
     return MultiProvider(
       providers: [
         RepositoryProvider(create: (ctx) => AuthRepository()),
+        ChangeNotifierProvider(create: (ctx) => UserRepository()),
+        ChangeNotifierProvider(create: (ctx) => ChatRepository()),
         // ChangeNotifierProvider(create: (ctx) => CompRepository()),
       ],
       child: GetMaterialApp(
           title: 'Test Chat App',
           debugShowCheckedModeBanner: false,
           theme: ThemeData(
-            scaffoldBackgroundColor: const Color(0xFFf1f1f1),
+            scaffoldBackgroundColor: bgColor,
             fontFamily: 'SukhumvitSet',
             colorScheme: ColorScheme.fromSwatch(
-                    primarySwatch: Colors.blue,
-                    accentColor: Colors.white,
-                    backgroundColor: const Color(0xFFf1f1f1))
+                    primarySwatch: primary,
+                    accentColor: white,
+                    backgroundColor: bgColor)
                 .copyWith(
               secondary: Colors.grey.shade200,
             ),
             cardTheme: const CardTheme(
-              color: Colors.white,
+              color: white,
             ),
             checkboxTheme: CheckboxThemeData(
                 side: const BorderSide(color: Colors.transparent),
@@ -79,7 +85,11 @@ class _MyAppState extends State<MyApp> {
           routes: {
             SignInPage.routeName: (ctx) => const SignInPage(),
             SignUpPage.routeName: (ctx) => const SignUpPage(),
+            MainPage.routeName: (ctx) => MainPage(
+                  tabIndex: 0,
+                ),
             ProfilePage.routeName: (ctx) => const ProfilePage(),
+            NewChatPage.routeName: (ctx) => const NewChatPage(),
           }),
     );
   }

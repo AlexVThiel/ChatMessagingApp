@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'color.dart';
+
 final icApp = Icon(
   Icons.message_rounded,
   color: Colors.white,
@@ -19,4 +21,16 @@ final icAccount = Icon(
 final icPass = Icon(
   Icons.lock,
   color: Color(0xFF236BBD),
+);
+
+final startMess = Icon(
+  Icons.edit,
+  size: 24,
+  color: Color(0xFF007AFF),
+);
+
+final cancel = Icon(
+  Icons.cancel,
+  size: 180,
+  color: red,
 );

@@ -3,7 +3,6 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter/widgets.dart';
 
 import '../../providers/auth_repository.dart';
-//import '../../models/auth_response.dart';
 
 part 'auth_state.dart';
 part 'auth_event.dart';
@@ -25,36 +24,34 @@ class AuthenticationBloc extends Bloc<AuthEvent, AuthState> {
     on<SignUp>((event, emit) async {
       emit(AuthLodingState());
       try {
-        final auth = await _userRepository.singUp(
+        final auth = await _userRepository.signUp(
+            email: event.email, password: event.pass, name: event.name);
+        emit(IsSingUp(auth));
+      } catch (e) {
+        emit(AuthUnauthenticated(e.toString()));
+      }
+    });
+
+    on<SignIn>((event, emit) async {
+      emit(AuthLodingState());
+      try {
+        final auth = await _userRepository.signIn(
             email: event.email, password: event.pass);
         emit(AuthAuthenticated(auth));
       } catch (e) {
         emit(AuthUnauthenticated(e.toString()));
       }
     });
-    /*on<SignIn>((event, emit) async {
+
+    on<SignOut>((event, emit) async {
       emit(AuthLodingState());
       try {
-        final auth = await _userRepository.login(
-            username: event.user, password: event.pass);
-        emit(AuthAuthenticated(auth));
+        await _userRepository.signOut();
+        emit(AuthUninitialized(true));
       } catch (e) {
         emit(AuthUnauthenticated(e.toString()));
       }
     });
-
-    
-
-    on<LoggedOut>((event, emit) async {
-      emit(AuthLodingState());
-
-      try {
-        final auth = await _userRepository.signOutCurrentUser();
-        emit(AuthUninitialized(auth));
-      } catch (e) {
-        emit(AuthUnauthenticated(e.toString()));
-      }
-    });*/
   }
 
   /*AuthenticationBloc({required this.userRepository}) : super(AuthenticationState());

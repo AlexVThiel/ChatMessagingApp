@@ -1,5 +1,6 @@
 import 'dart:developer';
 
+import 'package:chat_app/core/models/user.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -24,15 +25,22 @@ class AuthRepository {
     return false;
   }
 
-  Future<bool> singUp({required String email, required String password}) async {
+  Future<String> signUp(
+      {required String email,
+      required String password,
+      required String name}) async {
     debugPrint('-----singUp-----');
     try {
       final authCredential = await _auth.createUserWithEmailAndPassword(
           email: email, password: password);
 
       if (authCredential.user != null) {
+        User user = authCredential.user!;
+        /*UserModel userModel =
+            UserModel(uid: user.uid, email: email, name: name);*/
+
         log("User created successfully");
-        return true;
+        return user.uid;
       }
     } on FirebaseAuthException catch (e) {
       log(e.message!);
@@ -41,38 +49,42 @@ class AuthRepository {
       log(e.toString());
       rethrow;
     }
-    return false;
+    return '';
   }
 
-  /* Future<bool> singIn(
-      {required String username, required String password}) async {
-    safePrint('-----login-----');
-    if (await signOutCurrentUser()) {
-      try {
-        final result = await Amplify.Auth.signIn(
-            username: username,
-            password: password,
-            options: const SignInOptions(
-              pluginOptions: CognitoSignInPluginOptions(
-                clientMetadata: {
-                  "app": "company",
-                },
-              ),
-            ));
+  Future signIn({required String email, required String password}) async {
+    log('-----login-----');
+    try {
+      final authCredential = await _auth.signInWithEmailAndPassword(
+          email: email, password: password);
 
-        safePrint('signing in  success');
-        //safePrint('signing in  result: ${result.toString()}');
-        final getUser = await _getUserIdFromAttributes();
-        return getUser; //result.isSignedIn; //await _getUserIdFromAttributes();
-      } on AuthException catch (e) {
-        safePrint('error signing in : ${e.toString()}');
-        return false;
+      if (authCredential.user != null) {
+        log("User loggedin successfully");
+        final shared = await SharedPreferences.getInstance(); //
+        //shared.clear();
+        shared.setString('uid', authCredential.user!.uid);
+        return true;
+        //authCredential.user!;
       }
+    } on FirebaseAuthException catch (e) {
+      log(e.message!);
+      rethrow;
+    } catch (e) {
+      log(e.toString());
+      rethrow;
     }
-
-    return false;
+    return null;
   }
 
+  Future<void> signOut() async {
+    try {
+      await _auth.signOut();
+    } catch (e) {
+      log(e.toString());
+      rethrow;
+    }
+  }
+/*
   Future<bool> _getUserIdFromAttributes() async {
     safePrint('-----getUserIdFromAttributes-----');
     try {

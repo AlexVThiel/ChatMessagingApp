@@ -25,11 +25,11 @@ class IsSingIn extends AuthState {
 }
 
 class IsSingUp extends AuthState {
-  final bool isSingUp;
+  final String uid;
 
-  IsSingUp(this.isSingUp);
+  IsSingUp(this.uid);
   @override
-  List<Object> get props => [isSingUp];
+  List<Object> get props => [uid];
 }
 
 class AuthAuthenticated extends AuthState {

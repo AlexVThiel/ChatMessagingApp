@@ -1,6 +1,10 @@
+import 'package:chat_app/screens/auth/profile_page.dart';
+import 'package:chat_app/screens/main_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../blocs/auth/auth_bloc.dart';
 import '../../constants/styles.dart';
 
 class SignInCard extends StatefulWidget {
@@ -103,38 +107,32 @@ class _SignInCardState extends State<SignInCard> {
     );
   }
 
-  /* Widget _signInButton() {
+  void _signInSucess() {
+    showDialog(
+        context: context,
+        builder: (ctx) {
+          return AlertDialog(
+            title: Text("Sign In Success.", style: Constant.size14cB4),
+            content: null,
+            actions: [
+              TextButton(
+                  onPressed: () {
+                    Navigator.pop(ctx);
+                    Navigator.of(context).pushNamedAndRemoveUntil(
+                        MainPage.routeName, (Route<dynamic> route) => false);
+                  },
+                  child: const Text('Done')),
+            ],
+          );
+        });
+  }
+
+  Widget _signInButton() {
     return BlocListener<AuthenticationBloc, AuthState>(
       listener: (context, state) {
         //debugPrint('_loginButton() ${state.toString()}');
         if (state is AuthAuthenticated) {
-          if (state.auth) {
-            Navigator.of(context)
-                .pushReplacementNamed(ProfilePage.routeName);
-          } else {
-            showDialog(
-                context: context,
-                barrierDismissible: false,
-                builder: (ctx) {
-                  return AlertDialog(
-                    title: Text(
-                      'Sorry',
-                      style: Constant.size14cB6,
-                    ),
-                    content: Text(
-                      'Username or Password is not correct',
-                      style: Constant.size14cB4,
-                    ),
-                    actions: [
-                      TextButton(
-                          onPressed: () {
-                            Navigator.pop(ctx);
-                          },
-                          child: const Text('Try Again')),
-                    ],
-                  );
-                });
-          }
+          _signInSucess();
         }
 
         if (state is AuthUnauthenticated) {
@@ -144,11 +142,11 @@ class _SignInCardState extends State<SignInCard> {
               builder: (ctx) {
                 return AlertDialog(
                   title: Text(
-                    'ขออภัย',
+                    'Sorry',
                     style: Constant.size14cB6,
                   ),
                   content: Text(
-                    'Username หรือ Password ไม่ถูกต้อง',
+                    'Username or Password is not correct',
                     style: Constant.size14cB4,
                   ),
                   actions: [
@@ -156,7 +154,7 @@ class _SignInCardState extends State<SignInCard> {
                         onPressed: () {
                           Navigator.pop(ctx);
                         },
-                        child: const Text('ลองอีกครั้ง')),
+                        child: const Text('try again')),
                   ],
                 );
               });
@@ -189,19 +187,19 @@ class _SignInCardState extends State<SignInCard> {
                 }
                 context
                     .read<AuthenticationBloc>()
-                    .add(LoggedIn(_authData['email']!, _authData['password']!));
+                    .add(SignIn(_authData['email']!, _authData['password']!));
                 // _submit();
               },
               child: const Text(
-                'ลงชื่อเข้าสู่ระบบ',
+                'Sign In',
                 style: TextStyle(color: Colors.white),
               )),
         );
       }),
     );
   }
-*/
-  Widget _loginForm() {
+
+  Widget _signInForm() {
     return Form(
       key: _formKey,
       child: SingleChildScrollView(
@@ -214,7 +212,8 @@ class _SignInCardState extends State<SignInCard> {
             _passwordField(),
             const SizedBox(
               height: 20,
-            ), // _signInButton(),
+            ),
+            _signInButton(),
             Container(
               width: double.infinity,
               padding: const EdgeInsets.only(top: 15),
@@ -259,7 +258,7 @@ class _SignInCardState extends State<SignInCard> {
           ),
           Container(
             padding: const EdgeInsets.only(top: 20, left: 20, right: 20),
-            child: _loginForm(),
+            child: _signInForm(),
           ),
         ],
       ),

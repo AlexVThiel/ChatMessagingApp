@@ -54,7 +54,7 @@ class SignInPage extends StatelessWidget {
                     ),
                     BlocBuilder<AuthenticationBloc, AuthState>(
                         builder: (context, state) {
-                      if (state is AuthLodingState) {
+                      /*   if (state is AuthLodingState) {
                         return Padding(
                           padding: const EdgeInsets.only(top: 40),
                           child: Center(
@@ -63,11 +63,7 @@ class SignInPage extends StatelessWidget {
                             ),
                           ),
                         );
-                      }
-
-                      if (state is AuthAuthenticated) {
-                        return Container();
-                      }
+                      }*/
                       return Column(
                         children: [
                           Padding(
