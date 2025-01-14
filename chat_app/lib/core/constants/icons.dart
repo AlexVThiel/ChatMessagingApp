@@ -34,3 +34,9 @@ final cancel = Icon(
   size: 180,
   color: red,
 );
+
+final send = Icon(
+  Icons.send,
+  size: 20,
+  color: primary,
+);

@@ -9,6 +9,7 @@ import 'package:provider/provider.dart';
 import '../../core/constants/color.dart';
 import '../../core/constants/icons.dart';
 import '../../core/constants/styles.dart';
+import '../../core/models/user.dart';
 import '../../core/providers/chat_reposity.dart';
 
 class MainChatPage extends StatefulWidget {
@@ -46,7 +47,7 @@ class _MainChatPageState extends State<MainChatPage> {
   }
 
   void _createNewRoom() async {
-    Navigator.of(context).pushNamed(NewChatPage.routeName);
+    Navigator.pushNamed(context, NewChatPage.routeName);
   }
 
   @override
@@ -67,7 +68,8 @@ class _MainChatPageState extends State<MainChatPage> {
                     padding: const EdgeInsets.only(right: 15.0),
                     child: GestureDetector(
                       onTap: () {
-                        _createNewRoom();
+                        Navigator.pushNamed(context, NewChatPage.routeName);
+                        // _createNewRoom();
                       },
                       child: startMess,
                     ));

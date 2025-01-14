@@ -1,6 +1,7 @@
 import 'dart:developer';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -8,6 +9,18 @@ import '../models/user.dart';
 
 class UserRepository with ChangeNotifier {
   final _fire = FirebaseFirestore.instance;
+
+  UserM? _currentUser;
+  UserM? get user => _currentUser;
+
+  getUser() async {
+    final userData = await loadUser();
+
+    if (userData != null) {
+      _currentUser = userData;
+      notifyListeners();
+    }
+  }
 
   Future<void> saveUser(Map<String, dynamic> userData) async {
     final shared = await SharedPreferences.getInstance(); //
@@ -22,13 +35,15 @@ class UserRepository with ChangeNotifier {
     }
   }
 
-  Future<Map<String, dynamic>?> loadUser(String uid) async {
+  Future<UserM?> loadUser() async {
+    final shared = await SharedPreferences.getInstance();
+    final uid = shared.getString('uid')!;
     try {
       final res = await _fire.collection("users").doc(uid).get();
 
       if (res.data() != null) {
         log("User fetched successfully");
-        return res.data();
+        return UserM.fromMap(res.data()!);
       }
     } catch (e) {
       rethrow;
@@ -36,7 +51,7 @@ class UserRepository with ChangeNotifier {
     return null;
   }
 
-  Future<List<UserModel>> fetchUsers(String currentUserId) async {
+  Future<List<UserM>> fetchUsers(String currentUserId) async {
     try {
       final res = await _fire
           .collection("users")
@@ -44,14 +59,14 @@ class UserRepository with ChangeNotifier {
           .get();
 
       return res.docs
-          .map((e) => UserModel.fromMap(e.data()))
+          .map((e) => UserM.fromMap(e.data()))
           .toList(); //res.docs.map((e) => e.data()).toList();
     } catch (e) {
       rethrow;
     }
   }
 
-  Future<List<UserModel>> searchUsers(String search) async {
+  Future<List<UserM>> searchUsers(String search) async {
     final shared = await SharedPreferences.getInstance();
     final uid = shared.getString('uid')!;
     search = search.toLowerCase();
@@ -60,19 +75,18 @@ class UserRepository with ChangeNotifier {
     try {
       final res = await _fire
           .collection("users")
-          .where(Filter.and(
-              Filter("uid", isNotEqualTo: uid),
-              Filter(search.contains('@') ? "email" : "search",
-                  isGreaterThanOrEqualTo: search)))
+          .where("uid", isNotEqualTo: uid)
+          .where(search.contains('@') ? "email" : "search",
+              isGreaterThan: search)
           .orderBy('name')
 
-          /*search.contains('@') ? "email" : "search",
-              isGreaterThan: search.toUpperCase())*/
+          /*.where(search.contains('@') ? "email" : "search", isGreaterThanOrEqualTo: search)
+          */
           //.where('name', isGreaterThanOrEqualTo: search)
           // .where("search", isLessThanOrEqualTo: '$search\u{FFFF}')
           .get();
 
-      return res.docs.map((e) => UserModel.fromMap(e.data())).toList();
+      return res.docs.map((e) => UserM.fromMap(e.data())).toList();
       //return res.docs.map((e) => e.data()).toList();
     } catch (e) {
       rethrow;

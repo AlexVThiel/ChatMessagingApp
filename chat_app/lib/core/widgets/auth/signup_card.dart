@@ -164,8 +164,8 @@ class _SignUpCardState extends State<SignUpCard> {
   }
 
   void _signInUpSucess(String uid) {
-    UserModel userModel =
-        UserModel(uid: uid, name: _authData['name'], email: _authData['email']);
+    UserM userModel =
+        UserM(uid: uid, name: _authData['name'], email: _authData['email']);
     Provider.of<UserRepository>(context, listen: false)
         .saveUser(userModel.toMap());
     showDialog(

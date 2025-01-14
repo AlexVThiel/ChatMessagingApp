@@ -8,6 +8,8 @@ import 'package:provider/provider.dart';
 import '../../core/constants/color.dart';
 import '../../core/constants/icons.dart';
 import '../../core/constants/styles.dart';
+import '../../core/widgets/chat/user_search_tile.dart';
+import 'chat_room_page.dart';
 
 class NewChatPage extends StatefulWidget {
   const NewChatPage({super.key});
@@ -20,35 +22,12 @@ class NewChatPage extends StatefulWidget {
 
 class _NewChatPageState extends State<NewChatPage> {
   TextEditingController searchController = TextEditingController();
-  var allUsers = <UserModel>[];
-  var items = <UserModel>[];
+  var usersList = <UserM>[];
 
   @override
   void dispose() {
     searchController.dispose();
     super.dispose();
-  }
-
-  void filterSearchResults(String query) {
-    /* List<UserModel> dummySearchList = <UserModel>[];
-    dummySearchList.addAll(allUsers);
-    if (query.isNotEmpty) {
-      List<UserModel> dummyListData = <UserModel>[];
-      for (var item in dummySearchList) {
-        dummyListData.add(item);
-      }
-      setState(() {
-        items.clear();
-        items.addAll(dummyListData);
-      });
-      return;
-    } else {
-      setState(() {
-        items.clear();
-        items.addAll(allUsers);
-      });
-    }*/
-    context.read<UserBloc>().add(SearchUsers(query));
   }
 
   @override
@@ -99,24 +78,23 @@ class _NewChatPageState extends State<NewChatPage> {
                         );
                       }),
                     ),
+                    Constant.sizedBoxH10,
                     BlocListener<UserBloc, UserState>(
                       listener: (context, state) {
                         debugPrint(
                             '-----BlocListener state: ${state.runtimeType}');
-                        if (state is UsersLodingState) {
-                          //items.clear();
-                          //allCaht.clear();
+                        if (state is LodingState) {
+                          usersList.clear();
                         }
 
                         if (state is UsersLoadedState) {
-                          //items.addAll(state.order.data);
-                          //   allCaht.addAll(state.order.data);
+                          usersList.addAll(state.usersList);
                           print(state.usersList.toString());
                         }
                       },
                       child: BlocBuilder<UserBloc, UserState>(
                           builder: (context, state) {
-                        /*  if (state is UsersLodingState) {
+                        /* if (state is LodingState) {
                           return Padding(
                             padding: const EdgeInsets.only(top: 40),
                             child: Center(
@@ -128,7 +106,7 @@ class _NewChatPageState extends State<NewChatPage> {
                         }*/
 
                         if (state is UsersLoadedState) {
-                          return Center(
+                          /*return Center(
                             child: SizedBox(
                               child: Column(
                                 children: [
@@ -149,93 +127,53 @@ class _NewChatPageState extends State<NewChatPage> {
                                 ],
                               ),
                             ),
-                          );
+                          );*/
                           // debugPrint(  '-----OrderLoadedState data ${state.order.data}');
-                          /* return items.isNotEmpty
-                                ? SizedBox(
-                                    child: ListView.builder(
-                                        physics:
-                                            const NeverScrollableScrollPhysics(),
-                                        shrinkWrap: true,
-                                        itemCount: items.length,
-                                        itemBuilder:
-                                            (BuildContext context, int index) {
-                                          return OrderCard(
-                                              data: items[index],
-                                              action: _onConfirmTap);
-                                          // Container();
-                                        }),
-                                  )
-                                : items.isEmpty && filter != ''
-                                    ? const Expanded(
-                            child: Center(
-                              child: Text("No Users yet"),
-                            ),
-                          )
-                                    : SizedBox(
-                                        width: double.infinity,
-                                        height: double.maxFinite,
-                                        child: Column(
-                                          children: [
-                                            AspectRatio(
-                                              aspectRatio: 1.78,
-                                              child: Image.asset(
-                                                'assets/img_order.png',
-                                                fit: BoxFit.contain,
-                                              ),
-                                            ),
-                                            const Padding(
-                                              padding: EdgeInsets.only(top: 10.0),
-                                              child: Text(
-                                                "ออเดอร์",
-                                                style: TextStyle(
-                                                  fontSize: 14,
-                                                  fontWeight: FontWeight.w600,
-                                                  color: Color(0xFF474747),
+                          return usersList.isNotEmpty
+                              ? SizedBox(
+                                  child: ListView.builder(
+                                      physics:
+                                          const NeverScrollableScrollPhysics(),
+                                      shrinkWrap: true,
+                                      itemCount: usersList.length,
+                                      itemBuilder:
+                                          (BuildContext context, int index) {
+                                        return UserSearchTile(
+                                            user: usersList[index],
+                                            onTap: () =>
+                                                Navigator.pushReplacementNamed(
+                                                    context,
+                                                    ChatRoomPage.routeName,
+                                                    arguments:
+                                                        usersList[index]));
+                                        // Container();
+                                      }),
+                                )
+                              : Center(
+                                  child: SizedBox(
+                                    child: Column(
+                                      children: [
+                                        /* AspectRatio(
+                                                aspectRatio: 1.78,
+                                                child: Image.asset(
+                                                  'assets/img_order.png',
+                                                  fit: BoxFit.contain,
                                                 ),
-                                              ),
-                                            ),
-                                            const Padding(
-                                              padding: EdgeInsets.only(
-                                                  top: 15, bottom: 15),
-                                              child: Text(
-                                                "You don't have any order. Please create an order by click button below or button on the top right of screen",
-                                                style: TextStyle(
-                                                  fontSize: 14,
-                                                  fontWeight: FontWeight.w400,
-                                                ),
-                                              ),
-                                            ),
-                                            Container(
-                                              decoration: BoxDecoration(
-                                                borderRadius:
-                                                    BorderRadius.circular(6),
-                                                color: const Color(0XFF1A73F0),
-                                              ),
-                                              child: Padding(
-                                                padding: const EdgeInsets.only(
-                                                    left: 40, right: 40),
-                                                child: BlocBuilder<OrderBloc,
-                                                        OrderState>(
-                                                    builder: (context, state) {
-                                                  return TextButton(
-                                                      onPressed: () {
-                                                        _onCreateTap(context);
-                                                      },
-                                                      child: const Text(
-                                                        'สร้างออเดอร์',
-                                                        style: TextStyle(
-                                                            color: Colors.white),
-                                                      ));
-                                                }),
-                                              ),
-                                            )
-                                          ],
+                                              ),*/
+                                        Padding(
+                                          padding: EdgeInsets.only(top: 10.0),
+                                          child: Text(
+                                            "You don\'t have any message",
+                                            style: Constant.size14cB6,
+                                          ),
                                         ),
-                                      );*/
+                                      ],
+                                    ),
+                                  ),
+                                );
                         }
 
-                        if (state is UsersErrorState) {
+                        if (state is ErrorState) {
                           return SizedBox(
                             width: double.infinity,
                             height: double.maxFinite,

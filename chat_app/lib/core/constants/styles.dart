@@ -299,4 +299,6 @@ class Constant {
   static SizedBox sizedBoxH25 = const SizedBox(
     height: 25,
   );
+
+  static Radius r16 = Radius.circular(16);
 }

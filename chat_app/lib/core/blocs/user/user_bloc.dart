@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/widgets.dart';
@@ -11,14 +13,25 @@ part 'user_state.dart';
 class UserBloc extends Bloc<UserEvent, UserState> {
   final UserRepository _userRepository;
 
-  UserBloc(this._userRepository) : super(UsersLodingState()) {
+  UserBloc(this._userRepository) : super(LodingState()) {
     on<SearchUsers>((event, emit) async {
-      emit(UsersLodingState());
+      emit(LodingState());
       try {
         final users = await _userRepository.searchUsers(event.search);
         emit(UsersLoadedState(users));
       } catch (e) {
-        emit(UsersErrorState(e.toString()));
+        emit(ErrorState(e.toString()));
+      }
+    });
+
+    on<LoadUser>((event, emit) async {
+      emit(LodingState());
+      try {
+        // Fetch user data from repository or API
+        final user = await _userRepository.loadUser();
+        emit(UserLoadedState(user!));
+      } catch (e) {
+        emit(ErrorState(e.toString()));
       }
     });
 

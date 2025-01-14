@@ -1,5 +1,5 @@
 import 'package:chat_app/screens/auth/profile_page.dart';
-import 'package:chat_app/screens/main_page.dart';
+import 'package:chat_app/screens/home_nav_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -119,7 +119,7 @@ class _SignInCardState extends State<SignInCard> {
                   onPressed: () {
                     Navigator.pop(ctx);
                     Navigator.of(context).pushNamedAndRemoveUntil(
-                        MainPage.routeName, (Route<dynamic> route) => false);
+                        HomeNavPage.routeName, (Route<dynamic> route) => false);
                   },
                   child: const Text('Done')),
             ],

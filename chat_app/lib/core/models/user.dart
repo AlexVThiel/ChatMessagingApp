@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'dart:developer';
 
-class UserModel {
+class UserM {
   final String? uid;
   final String? name;
   final String? email;
@@ -9,7 +9,7 @@ class UserModel {
   final Map<String, dynamic>? lastMessage;
   final int? unreadCounter;
 
-  UserModel(
+  UserM(
       {this.uid,
       this.name,
       this.email,
@@ -28,9 +28,9 @@ class UserModel {
     };
   }
 
-  factory UserModel.fromMap(Map<String, dynamic> map) {
+  factory UserM.fromMap(Map<String, dynamic> map) {
     log(map.toString());
-    return UserModel(
+    return UserM(
       uid: map['uid'] != null ? map['uid'] as String : null,
       name: map['name'] != null ? map['name'] as String : null,
       email: map['email'] != null ? map['email'] as String : null,
@@ -46,8 +46,8 @@ class UserModel {
 
   String toJson() => json.encode(toMap());
 
-  factory UserModel.fromJson(String source) =>
-      UserModel.fromMap(json.decode(source) as Map<String, dynamic>);
+  factory UserM.fromJson(String source) =>
+      UserM.fromMap(json.decode(source) as Map<String, dynamic>);
 
   @override
   String toString() {

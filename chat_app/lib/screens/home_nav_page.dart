@@ -1,23 +1,22 @@
 import 'package:chat_app/screens/profile/main_profile_page.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 
 import 'chats/main_chat_page.dart';
 import 'home_page.dart';
 
-class MainPage extends StatefulWidget {
+class HomeNavPage extends StatefulWidget {
   int tabIndex = 0;
   static const routeName = '/mainPage';
-  MainPage({
+  HomeNavPage({
     super.key,
     required this.tabIndex,
   });
 
   @override
-  State<MainPage> createState() => _MainPageState();
+  State<HomeNavPage> createState() => _HomeNavPageState();
 }
 
-class _MainPageState extends State<MainPage> {
+class _HomeNavPageState extends State<HomeNavPage> {
   static const List originalList = [
     HomePage(),
     MainChatPage(),

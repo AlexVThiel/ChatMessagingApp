@@ -6,7 +6,7 @@ import '../../models/user.dart';
 
 class ChatTile extends StatelessWidget {
   const ChatTile({super.key, this.onTap, required this.user});
-  final UserModel user;
+  final UserM user;
   final void Function()? onTap;
 
   @override

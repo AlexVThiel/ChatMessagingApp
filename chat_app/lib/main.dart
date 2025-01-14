@@ -13,11 +13,13 @@ import 'core/constants/color.dart';
 import 'core/providers/auth_repository.dart';
 import 'core/providers/chat_reposity.dart';
 import 'core/providers/user_repository.dart';
+import 'core/utils/route_utils.dart';
 import 'screens/auth/profile_page.dart';
 import 'screens/auth/signin_page.dart';
 import 'network/dependency_injection.dart';
+import 'screens/chats/chat_room_page.dart';
 import 'screens/chats/new_chat_page.dart';
-import 'screens/main_page.dart';
+import 'screens/home_nav_page.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -52,45 +54,48 @@ class _MyAppState extends State<MyApp> {
         // ChangeNotifierProvider(create: (ctx) => CompRepository()),
       ],
       child: GetMaterialApp(
-          title: 'Test Chat App',
-          debugShowCheckedModeBanner: false,
-          theme: ThemeData(
-            scaffoldBackgroundColor: bgColor,
-            fontFamily: 'SukhumvitSet',
-            colorScheme: ColorScheme.fromSwatch(
-                    primarySwatch: primary,
-                    accentColor: white,
-                    backgroundColor: bgColor)
-                .copyWith(
-              secondary: Colors.grey.shade200,
-            ),
-            cardTheme: const CardTheme(
-              color: white,
-            ),
-            checkboxTheme: CheckboxThemeData(
-                side: const BorderSide(color: Colors.transparent),
-                fillColor: WidgetStateColor.resolveWith(
-                  (states) {
-                    if (states.contains(WidgetState.selected)) {
-                      return const Color.fromARGB(255, 255, 148,
-                          148); // the color when checkbox is selected;
-                    }
-                    return Colors
-                        .grey.shade300; //the color when checkbox is unselected;
-                  },
-                )),
-            useMaterial3: true,
+        title: 'Test Chat App',
+        debugShowCheckedModeBanner: false,
+        theme: ThemeData(
+          scaffoldBackgroundColor: bgColor,
+          fontFamily: 'SukhumvitSet',
+          colorScheme: ColorScheme.fromSwatch(
+                  primarySwatch: primary,
+                  accentColor: white,
+                  backgroundColor: bgColor)
+              .copyWith(
+            secondary: Colors.grey.shade200,
           ),
-          home: const SplashPage(),
-          routes: {
+          cardTheme: const CardTheme(
+            color: white,
+          ),
+          checkboxTheme: CheckboxThemeData(
+              side: const BorderSide(color: Colors.transparent),
+              fillColor: WidgetStateColor.resolveWith(
+                (states) {
+                  if (states.contains(WidgetState.selected)) {
+                    return const Color.fromARGB(255, 255, 148,
+                        148); // the color when checkbox is selected;
+                  }
+                  return Colors
+                      .grey.shade300; //the color when checkbox is unselected;
+                },
+              )),
+          useMaterial3: true,
+        ),
+        home: const SplashPage(),
+        onGenerateRoute: RouteUtils.onGenerateRoute,
+        /* routes: {
             SignInPage.routeName: (ctx) => const SignInPage(),
             SignUpPage.routeName: (ctx) => const SignUpPage(),
-            MainPage.routeName: (ctx) => MainPage(
+            HomeNavPage.routeName: (ctx) => HomeNavPage(
                   tabIndex: 0,
                 ),
             ProfilePage.routeName: (ctx) => const ProfilePage(),
             NewChatPage.routeName: (ctx) => const NewChatPage(),
-          }),
+            ChatRoomPage.routeName: (ctx) => const ChatRoomPage(),
+          }*/
+      ),
     );
   }
 }
