@@ -1,13 +1,16 @@
 import 'package:chat_app/core/blocs/user/user_bloc.dart';
 import 'package:chat_app/core/models/user.dart';
+import 'package:chat_app/core/providers/chat_reposity.dart';
 import 'package:chat_app/core/providers/user_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:provider/provider.dart';
 
+import '../../core/blocs/chat/chat_bloc.dart';
 import '../../core/constants/color.dart';
 import '../../core/constants/icons.dart';
 import '../../core/constants/styles.dart';
+import '../../core/models/message.dart';
 import '../../core/widgets/chat/user_search_tile.dart';
 import 'chat_room_page.dart';
 
@@ -30,12 +33,46 @@ class _NewChatPageState extends State<NewChatPage> {
     super.dispose();
   }
 
+  void setNewChatRoom(UserM u, BuildContext ct) async {
+    final currentUser =
+        Provider.of<UserRepository>(context, listen: false).user!;
+    var chatRoomId = "";
+
+    if (currentUser.uid.hashCode > u.uid.hashCode) {
+      chatRoomId = "${currentUser.uid}_${u.uid}";
+    } else {
+      chatRoomId = "${u.uid}_${currentUser.uid}";
+    }
+    Provider.of<UserRepository>(context, listen: false)
+        .addRooms(u.uid!, chatRoomId);
+
+    final now = DateTime.now();
+
+    final message = Message(
+        id: now.millisecondsSinceEpoch.toString(),
+        content: '',
+        senderId: currentUser.uid,
+        receiverId: u.uid,
+        timestamp: now);
+
+    ct.read<ChatBloc>().add(SaveChat(message.toMap(), chatRoomId));
+    Navigator.pushReplacementNamed(context, ChatRoomPage.routeName,
+        arguments: u);
+  }
+
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (context) => UserBloc(
-        RepositoryProvider.of<UserRepository>(context),
-      ),
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider(
+            create: (context) => UserBloc(
+                  RepositoryProvider.of<UserRepository>(context),
+                )),
+        BlocProvider(
+            create: (context) => ChatBloc(
+                  RepositoryProvider.of<ChatRepository>(context),
+                )),
+      ],
       child: Scaffold(
           appBar: AppBar(
             centerTitle: true,
@@ -89,12 +126,11 @@ class _NewChatPageState extends State<NewChatPage> {
 
                         if (state is UsersLoadedState) {
                           usersList.addAll(state.usersList);
-                          print(state.usersList.toString());
                         }
                       },
                       child: BlocBuilder<UserBloc, UserState>(
                           builder: (context, state) {
-                        /* if (state is LodingState) {
+                        if (state is LodingState) {
                           return Padding(
                             padding: const EdgeInsets.only(top: 40),
                             child: Center(
@@ -103,52 +139,28 @@ class _NewChatPageState extends State<NewChatPage> {
                               ),
                             ),
                           );
-                        }*/
+                        }
 
                         if (state is UsersLoadedState) {
-                          /*return Center(
-                            child: SizedBox(
-                              child: Column(
-                                children: [
-                                  /* AspectRatio(
-                                                aspectRatio: 1.78,
-                                                child: Image.asset(
-                                                  'assets/img_order.png',
-                                                  fit: BoxFit.contain,
-                                                ),
-                                              ),*/
-                                  Padding(
-                                    padding: EdgeInsets.only(top: 10.0),
-                                    child: Text(
-                                      "You don\'t have any message",
-                                      style: Constant.size14cB6,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          );*/
-                          // debugPrint(  '-----OrderLoadedState data ${state.order.data}');
                           return usersList.isNotEmpty
-                              ? SizedBox(
-                                  child: ListView.builder(
-                                      physics:
-                                          const NeverScrollableScrollPhysics(),
-                                      shrinkWrap: true,
-                                      itemCount: usersList.length,
-                                      itemBuilder:
-                                          (BuildContext context, int index) {
-                                        return UserSearchTile(
+                              ? BlocBuilder<ChatBloc, ChatState>(
+                                  builder: (ctx, state) {
+                                  return SizedBox(
+                                    child: ListView.builder(
+                                        physics:
+                                            const NeverScrollableScrollPhysics(),
+                                        shrinkWrap: true,
+                                        itemCount: usersList.length,
+                                        itemBuilder:
+                                            (BuildContext context, int index) {
+                                          return UserSearchTile(
                                             user: usersList[index],
-                                            onTap: () =>
-                                                Navigator.pushReplacementNamed(
-                                                    context,
-                                                    ChatRoomPage.routeName,
-                                                    arguments:
-                                                        usersList[index]));
-                                        // Container();
-                                      }),
-                                )
+                                            onTap: () => setNewChatRoom(
+                                                usersList[index], ctx),
+                                          );
+                                        }),
+                                  );
+                                })
                               : Center(
                                   child: SizedBox(
                                     child: Column(

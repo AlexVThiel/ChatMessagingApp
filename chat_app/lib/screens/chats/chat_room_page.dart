@@ -1,6 +1,7 @@
 import 'package:chat_app/core/models/user.dart';
 import 'package:chat_app/core/providers/chat_reposity.dart';
 import 'package:chat_app/core/providers/user_repository.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:provider/provider.dart';
@@ -20,13 +21,13 @@ class ChatRoomPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final currentUser = Provider.of<UserRepository>(context).user;
-
+    final roomId = Provider.of<ChatRepository>(context).getChatRoom(receiver);
     TextEditingController textController = TextEditingController();
 
     return BlocProvider(
       create: (context) => ChatBloc(
         RepositoryProvider.of<ChatRepository>(context),
-      )..add(LoadAllChat()),
+      )..add(LoadChat(roomId)),
       child: Scaffold(
         appBar: AppBar(
           // centerTitle: true,
@@ -35,7 +36,83 @@ class ChatRoomPage extends StatelessWidget {
           backgroundColor: primary,
           elevation: 2,
         ),
-        body: Column(
+        body:BlocBuilder<ChatBloc, ChatState>(
+          builder: (context, state) {
+            if (state is ChatLodingState) {
+              return const Center(child: CircularProgressIndicator());
+            } else if (state is ChatErrorState) {
+              return Center(child: Text('Error: ${state.error}'));
+            } else if (state is ChatLoadedState) {
+              return Column(
+                children: [
+                  Expanded(
+                    child: StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
+                      stream: Provider.of<ChatRepository>(context).getMessages(roomId)
+                     /*  FirebaseFirestore.instance
+                          .collection('messages')
+                          .orderBy('timestamp', descending: true)
+                          .snapshots()*/,
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState == ConnectionState.waiting) {
+                          return const Center(child: CircularProgressIndicator());
+                        } else if (snapshot.hasError) {
+                          return Center(child: Text('Error: ${snapshot.error}'));
+                        } else {
+                          final messages = snapshot.data!.docs;
+                          return ListView.builder(
+                            reverse: true,
+                            itemCount: messages.length,
+                            itemBuilder: (context, index) {
+                              final messageData = messages[index].data();
+                              final sender = messageData['sender'];
+                              final message = messageData['message'];
+                              return ListTile(
+                                title: Text(message),
+                                subtitle: Text(sender),
+                              );
+                            },
+                          );
+                        }
+                      },
+                    ),
+                  ),
+                 /* const Divider(),
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: TextField(
+                            onSubmitted: (value) {
+                              context.read<ChatBloc>().add(SendMessage(message: value));
+                            },
+                            decoration: const InputDecoration(
+                              hintText: 'Type your message...',
+                            ),
+                          ),
+                        ),
+                        IconButton(
+                          onPressed: () {
+                            context
+                                .read<ChatBloc>()
+                                .add(SendMessage(message: value));
+                          },
+                          icon: const Icon(Icons.send),
+                        ),
+                      ],
+                    ),
+                  ),
+                */],
+              );
+            } else {
+              return Container(); // Handle other states if needed
+            }
+          },
+        ),
+      
+        
+        
+        /* Column(
           children: [
             Expanded(
               child: Padding(
@@ -105,7 +182,7 @@ class ChatRoomPage extends StatelessWidget {
               ),
             )
           ],
-        ),
+        ),*/
       ),
     );
   }

@@ -21,6 +21,17 @@ class UsersLoadedState extends UserState {
   List<Object?> get props => [message];*/
 }
 
+class UserUpdated extends UserState {
+  @override
+  List<Object?> get props => [];
+/*  final Message message;
+
+  ChatLoadedState(this.message);
+
+  @override
+  List<Object?> get props => [message];*/
+}
+
 class UserLoadedState extends UserState {
   final UserM user;
   UserLoadedState(this.user);

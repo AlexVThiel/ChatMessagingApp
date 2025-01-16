@@ -8,6 +8,7 @@ class UserM {
   final String? imageUrl;
   final Map<String, dynamic>? lastMessage;
   final int? unreadCounter;
+  final List<dynamic>? rooms;
 
   UserM(
       {this.uid,
@@ -15,7 +16,8 @@ class UserM {
       this.email,
       this.imageUrl,
       this.lastMessage,
-      this.unreadCounter});
+      this.unreadCounter,
+      this.rooms});
 
   Map<String, dynamic> toMap() {
     return <String, dynamic>{
@@ -24,7 +26,8 @@ class UserM {
       'email': email,
       'imageUrl': imageUrl,
       'lastMessage': lastMessage,
-      'unreadCounter': unreadCounter
+      'unreadCounter': unreadCounter,
+      'rooms': rooms
     };
   }
 
@@ -41,6 +44,7 @@ class UserM {
           : null,
       unreadCounter:
           map['unreadCounter'] != null ? map['unreadCounter'] as int : null,
+      rooms: map['rooms'] != null ? map['rooms'] as List<dynamic> : null,
     );
   }
 
@@ -51,6 +55,6 @@ class UserM {
 
   @override
   String toString() {
-    return 'UserModel(uid: $uid, name: $name, email: $email, imageUrl: $imageUrl, lastMessage: $lastMessage, unreadCounter: $unreadCounter)';
+    return 'UserModel(uid: $uid, name: $name, email: $email, imageUrl: $imageUrl, lastMessage: $lastMessage, unreadCounter: $unreadCounter, rooms: $rooms)';
   }
 }

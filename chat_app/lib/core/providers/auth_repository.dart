@@ -77,7 +77,9 @@ class AuthRepository {
   }
 
   Future<void> signOut() async {
+    final shared = await SharedPreferences.getInstance();
     try {
+      shared.clear();
       await _auth.signOut();
     } catch (e) {
       log(e.toString());

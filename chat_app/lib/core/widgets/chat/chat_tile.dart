@@ -45,7 +45,7 @@ class ChatTile extends StatelessWidget {
         children: [
           Text(
             user.lastMessage == null ? "" : getTime(),
-            style: const TextStyle(color: grey),
+            style: Constant.size10cCC4,
           ),
           Constant.sizedBoxH10,
           user.unreadCounter == 0 || user.unreadCounter == null

@@ -1,6 +1,8 @@
 import 'package:chat_app/screens/profile/main_profile_page.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
+import '../core/providers/user_repository.dart';
 import 'chats/main_chat_page.dart';
 import 'home_page.dart';
 
@@ -34,6 +36,13 @@ class _HomeNavPageState extends State<HomeNavPage> {
   void initState() {
     _selectedTab(widget.tabIndex);
     super.initState();
+  }
+
+  @override
+  void didChangeDependencies() {
+    // TODO: implement didChangeDependencies
+    Provider.of<UserRepository>(context, listen: false).getUser();
+    super.didChangeDependencies();
   }
 
   @override

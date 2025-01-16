@@ -35,6 +35,16 @@ class UserBloc extends Bloc<UserEvent, UserState> {
       }
     });
 
+    on<UpdateRoom>((event, emit) async {
+      emit(LodingState());
+      try {
+        await _userRepository.addRooms(event.rid, event.room);
+        emit(UserUpdated());
+      } catch (e) {
+        emit(ErrorState(e.toString()));
+      }
+    });
+
     /*on<SearchUsers>((event, emit) async {
       emit(UsersLodingState());
       try {

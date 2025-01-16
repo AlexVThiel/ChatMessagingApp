@@ -23,13 +23,43 @@ class UserRepository with ChangeNotifier {
   }
 
   Future<void> saveUser(Map<String, dynamic> userData) async {
-    final shared = await SharedPreferences.getInstance(); //
-    //shared.clear();
+    final shared = await SharedPreferences.getInstance();
     shared.setString('uid', userData["uid"]);
     try {
       await _fire.collection("users").doc(userData["uid"]).set(userData);
 
       log("User saved successfully");
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<void> addRooms(String reId, String rooms) async {
+    try {
+      final userRoom = _currentUser!.rooms;
+      final receiver = await _fire.collection("users").doc(reId).get();
+      final rec = UserM.fromMap(receiver.data()!);
+      final recRoom = rec.rooms;
+      // log('userRoom isEmpty: ${userRoom!.isEmpty}');
+
+      if (userRoom!.isNotEmpty && !userRoom.contains(rooms)) {
+        userRoom.add(rooms);
+      } else if (userRoom.isEmpty) {
+        userRoom.add(rooms);
+      }
+      await _fire
+          .collection("users")
+          .doc(_currentUser!.uid)
+          .update({"rooms": userRoom});
+
+      if (recRoom!.isNotEmpty && !recRoom.contains(rooms)) {
+        recRoom.add(rooms);
+      } else if (recRoom.isEmpty) {
+        recRoom.add(rooms);
+      }
+      await _fire.collection("users").doc(reId).update({"rooms": recRoom});
+
+      log("User update room successfully");
     } catch (e) {
       rethrow;
     }
@@ -70,8 +100,6 @@ class UserRepository with ChangeNotifier {
     final shared = await SharedPreferences.getInstance();
     final uid = shared.getString('uid')!;
     search = search.toLowerCase();
-    log('search $search');
-
     try {
       final res = await _fire
           .collection("users")
@@ -79,11 +107,6 @@ class UserRepository with ChangeNotifier {
           .where(search.contains('@') ? "email" : "search",
               isGreaterThan: search)
           .orderBy('name')
-
-          /*.where(search.contains('@') ? "email" : "search", isGreaterThanOrEqualTo: search)
-          */
-          //.where('name', isGreaterThanOrEqualTo: search)
-          // .where("search", isLessThanOrEqualTo: '$search\u{FFFF}')
           .get();
 
       return res.docs.map((e) => UserM.fromMap(e.data())).toList();

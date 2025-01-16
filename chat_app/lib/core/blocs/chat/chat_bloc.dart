@@ -14,8 +14,27 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
     on<LoadAllChat>((event, emit) async {
       emit(ChatLodingState());
       try {
-        /* final auth = await _chatRepository. .signUp(
-            email: event.email, password: event.pass);*/
+        _chatRepository.userChatRooms();
+        emit(ChatLoadedState());
+      } catch (e) {
+        emit(ChatErrorState(e.toString()));
+      }
+    });
+
+    on<LoadChat>((event, emit) async {
+      emit(ChatLodingState());
+      try {
+        _chatRepository.getMessages(event.roomId);
+        emit(ChatLoadedState());
+      } catch (e) {
+        emit(ChatErrorState(e.toString()));
+      }
+    });
+
+    on<SaveChat>((event, emit) async {
+      emit(ChatLodingState());
+      try {
+        await _chatRepository.saveMessage(event.message, event.chatRoomId);
         emit(ChatLoadedState());
       } catch (e) {
         emit(ChatErrorState(e.toString()));
