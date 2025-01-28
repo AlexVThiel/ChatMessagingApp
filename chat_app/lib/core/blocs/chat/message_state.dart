@@ -19,6 +19,17 @@ class ChatLoadedState extends ChatState {
   List<Object?> get props => [message];*/
 }
 
+class ChatRoomsLoadedState extends ChatState {
+  /* @override
+  List<Object?> get props => [];*/
+  final List<dynamic> recivers;
+
+  ChatRoomsLoadedState(this.recivers);
+
+  @override
+  List<Object?> get props => [recivers];
+}
+
 class ChatErrorState extends ChatState {
   final String error;
 

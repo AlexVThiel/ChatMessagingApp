@@ -1,3 +1,7 @@
+import 'dart:developer';
+
+import 'package:chat_app/core/models/user.dart';
+import 'package:chat_app/core/providers/user_repository.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/widgets.dart';
@@ -14,8 +18,9 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
     on<LoadAllChat>((event, emit) async {
       emit(ChatLodingState());
       try {
-        _chatRepository.userChatRooms();
-        emit(ChatLoadedState());
+        final chatrooms = await _chatRepository.userChatRooms();
+        log("chatrooms!.length ${chatrooms.length}");
+        emit(ChatRoomsLoadedState(chatrooms));
       } catch (e) {
         emit(ChatErrorState(e.toString()));
       }

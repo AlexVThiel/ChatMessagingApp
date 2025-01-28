@@ -13,12 +13,12 @@ class ChatTile extends StatelessWidget {
   Widget build(BuildContext context) {
     return ListTile(
       onTap: onTap,
-      tileColor: Colors.grey.shade200,
+      tileColor: Colors.green,
       contentPadding: Constant.paddingSide10,
       shape: RoundedRectangleBorder(borderRadius: Constant.borderRd15),
       leading: user.imageUrl == null
           ? CircleAvatar(
-              backgroundColor: grey.withOpacity(0.5),
+              backgroundColor: grey.withValues(alpha: 0.5),
               radius: 25,
               child: Text(
                 user.name![0],

@@ -5,6 +5,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../models/message.dart';
+
 class ChatRepository with ChangeNotifier {
   final _fire = FirebaseFirestore.instance;
   String _chatRoomId = "";
@@ -34,28 +36,78 @@ class ChatRepository with ChangeNotifier {
     }
   }
 
-  Future<void> userChatRooms() async {
+  Future<List> userChatRooms() async {
     final shared = await SharedPreferences.getInstance();
     final uid = shared.getString('uid')!;
+    final rooms =
+        await _fire.collection("users").doc(uid).get().then((receiver) {
+      final rec = UserM.fromMap(receiver.data()!);
+      final recRoom = rec.rooms;
+      var r = [];
+      for (var rid in recRoom!) {
+        final revid = (rid as String).replaceAll(uid, "").replaceAll("_", "");
+        final res =
+            _fire.collection("users").where("uid", isEqualTo: revid).get();
+        r.add(revid);
+      }
+      return r;
+      /* try {
+        for (var rid in recRoom!) {
+          //  final Stream<QuerySnapshot<Map<String, dynamic>>> querySnapshot =
+         final mess = _fire
+              .collection("chatRooms")
+              .doc(rid)
+              .collection("messages")
+              .orderBy("timestamp", descending: false)
+              .get();
+          final revid =
+                (rid as String).replaceAll(uid, "").replaceAll("_", "");
+                final list =
+                mess.docs.map((e) => Message.fromMap(e.data())).toList();
+
+              .listen((messages) {
+            final revid =
+                (rid as String).replaceAll(uid, "").replaceAll("_", "");
+            final list =
+                messages.docs.map((e) => Message.fromMap(e.data())).toList();
+           // r.add({revid, list});
+            return {revid, list};
+            // .addAll({revid, list} as Map);
+            //.add(
+            // messages.docs.map((e) => Message.fromMap(e.data())).toList());
+            //log('rooms.size : ${rooms.length}');
+          });
+        }
+
+        //  log('r.length : ${r[0].toString()}');
+        return r;
+      } catch (e) {
+        rethrow;
+      }*/
+    });
+    var u = [];
+    for (var rid in rooms!) {
+      final revid = (rid as String).replaceAll(uid, "").replaceAll("_", "");
+      final res =
+          await _fire.collection("users").where("uid", isEqualTo: revid).get();
+      u.add(UserM.fromMap(res.docs[0].data()));
+    }
+
+    log('u.length : ${u.length}');
+    // log('rooms.length : ${rooms.length}');
+    return u;
+  }
+
+  Future<UserM> getUsers(String recId) async {
     try {
-      final QuerySnapshot<Map<String, dynamic>> querySnapshot = await _fire
-          .collection("chatRooms")
-          .where('documentIdField',
-              isEqualTo:
-                  '24rGUVNbH7dxemZDv8EDwRo3rww2_QMnBQZG2tVMAgGCZmKi6S4N3WSF3')
-          .get();
+      final res =
+          await _fire.collection("users").where("uid", isEqualTo: recId).get();
 
-      log('usr : ${querySnapshot.size}');
-      /* await _fire.collection("chatRooms").get().then((snapshot) {
-        
-        var roomId =
-            snapshot.docs.where((doc) => doc.id.contains(uid)).toList();
-        // Process the filtered documents
-
-        log(roomId.toString());
-      });*/
-
-      //return res.docs.map((e) => UserM.fromMap(e.data())).toList();
+      return UserM.fromMap(res.docs[0].data());
+      /*  res.docs[0]
+          .data()
+          .map((e) => UserM.fromMap(e.data()))
+          .toList(); //res.docs.map((e) => e.data()).toList();*/
     } catch (e) {
       rethrow;
     }
